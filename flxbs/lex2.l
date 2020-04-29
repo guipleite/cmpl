@@ -20,8 +20,7 @@ while	                    return WHILE;
 if	                        return IF;
 else	                    return ELSE;
 printf                      return PRINTF;
-return                      return RETURN;
-break                       return BREAK;
+
 {digit}+                    return NUM;
 {alpha}({alpha}|{digit})*   return ID;
 "<="                        return LE;
