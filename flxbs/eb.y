@@ -1,11 +1,12 @@
 %{
-    #include stdio.h
+    #include <stdio.h>
+    #include"lex.yy.c"
+
 %}
 
-%token char int float void if else while for return break not lesser greater leq plus minus mult div lnot_eq lesser_eq greater_eq eq comma endline
-%token openB closeB openK closeK openP closeP mult_eq div_eq plus_eq minus_eq
-
-identifier string character interger floating
+%token char int float void if else while for return break not lesser greater leq plus minus mult div lnot_eq lesser_eq greater_eq eq and or land lor
+%token openB closeB openK closeK openP closeP mult_eq div_eq plus_eq minus_eq comma endline
+%token identifier string character integer floating enum
 
 %%
 
@@ -13,24 +14,29 @@ function-definition: declaration-specifier declarator declaration compound-state
 ;
 
 declaration-specifier: type-specifier
-                     | type-qualifier
+                    
 ;
 
 type-specifier: void
                    | char
                    | int
-                   | double
+                   | float
 ;
 
 specifier-qualifier: type-specifier
-                        | type-qualifier
+                        
 ;
 
 declarator:  direct-declarator
 ;
 
-type-qualifier: const
-                   | volatile
+direct-declarator: identifier
+                 | direct-declarator
+                 | direct-declarator constant-expression 
+                 | direct-declarator openP multi-identifier closeP
+                 | direct-declarator openP parameter-type-list closeP
+                 | openP declarator closeP
+
 ;
 
 constant-expression: conditional-expression
@@ -43,8 +49,8 @@ logical-or-expression: logical-and-expression
                           | logical-or-expression lor logical-and-expression
 ;
 
-logical-and-expression: inclusive-or-expression
-                           | logical-and-expression land inclusive-or-expression
+logical-and-expression: logical-or-expression
+                           | logical-and-expression land logical-or-expression
 ;
 
 and-expression: equality-expression
@@ -60,11 +66,11 @@ equality-expression: relational-expression
                         | equality-expression lnot_eq relational-expression
 ;
 
-relational-expression: shift-expression
-                          | relational-expression lesser  shift-expression
-                          | relational-expression greater shift-expression
-                          | relational-expression lesser_eq shift-expression
-                          | relational-expression greater_eq shift-expression
+relational-expression: additive-expression
+                          | relational-expression lesser     additive-expression
+                          | relational-expression greater    additive-expression
+                          | relational-expression lesser_eq  additive-expression
+                          | relational-expression greater_eq additive-expression
 ;
 
 additive-expression: multiplicative-expression
@@ -95,10 +101,9 @@ primary-expression: identifier
                        | openP expression closeP
 ;
 
-constant: integer-constant
-             | character-constant
-             | floating-constant
-             | enumeration-constant
+constant: integer
+             | character
+             | floating
 ;
 
 expression: assignment-expression
@@ -120,6 +125,14 @@ unary-operator:
                    | plus
                    | minus
                    
+;
+abstract-declarator: openP abstract-declarator closeP
+                        | openK constant-expression closeK
+                        | abstract-declarator openK closeK
+                        | abstract-declarator openK constant-expression closeK
+                        | abstract-declarator openP parameter-type-list closeP
+                        | openP parameter-type-list closeP
+                        | abstract-declarator openP closeP
 ;
 
 type-name: specifier-qualifier abstract-declarator
@@ -176,7 +189,11 @@ statement: expression-statement
               | compound-statement
               | selection-statement
               | iteration-statement
+              | return-statement
 
+;
+
+multi-identifier: | identifier
 ;
 
 expression-statement: expression endline
@@ -190,3 +207,7 @@ selection-statement: if openP expression closeP statement
 iteration-statement: while openP expression closeP statement
                     | for openP expression endline expression endline expression closeP statement
 ;
+return-statement: return expression endline
+                    | return endline
+                    | break endline
+; 
