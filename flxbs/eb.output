@@ -1,758 +1,1912 @@
-Nonterminals useless in grammar
-
-    specifier-qualifier
-    constant-expression
-    conditional-expression
-    logical-or-expression
-    logical-and-expression
-    and-expression
-    or-expression
-    equality-expression
-    relational-expression
-    additive-expression
-    multiplicative-expression
-    cast-expression
-    unary-expression
-    postfix-expression
-    primary-expression
-    constant
-    expression
-    assignment-expression
-    assignment-operator
-    unary-operator
-    abstract-declarator
-    type-name
-    enum-specifier
-    enumerator-list
-    enumerator
-    typedef-name
-    initializer
-    initializer-list
-    selection-statement
-    iteration-statement
-
-
 Terminals unused in grammar
 
-    if
-    else
-    while
-    for
-    not
-    lesser
-    greater
-    leq
-    plus
-    minus
-    mult
-    div
-    lnot_eq
-    lesser_eq
-    greater_eq
-    eq
-    and
-    or
-    land
-    lor
-    openK
-    closeK
-    mult_eq
-    div_eq
-    plus_eq
-    minus_eq
-    string
-    character
-    integer
-    floating
-    enum
+    BREAK
+    RETURN
+    ELSE
+    DOT
+    OTHER
+    AND
+    OR
 
 
-Rules useless in grammar
-
-   30 specifier-qualifier: type-specifier
-
-   31 direct-declarator: direct-declarator constant-expression
-
-   32 constant-expression: conditional-expression
-
-   33 conditional-expression: logical-or-expression
-
-   34 logical-or-expression: logical-and-expression
-   35                      | logical-or-expression lor logical-and-expression
-
-   36 logical-and-expression: logical-or-expression
-   37                       | logical-and-expression land logical-or-expression
-
-   38 and-expression: equality-expression
-   39               | and-expression and equality-expression
-
-   40 or-expression: equality-expression
-   41              | or-expression or equality-expression
-
-   42 equality-expression: relational-expression
-   43                    | equality-expression leq relational-expression
-   44                    | equality-expression lnot_eq relational-expression
-
-   45 relational-expression: additive-expression
-   46                      | relational-expression lesser additive-expression
-   47                      | relational-expression greater additive-expression
-   48                      | relational-expression lesser_eq additive-expression
-   49                      | relational-expression greater_eq additive-expression
-
-   50 additive-expression: multiplicative-expression
-   51                    | additive-expression plus multiplicative-expression
-   52                    | additive-expression minus multiplicative-expression
-
-   53 multiplicative-expression: cast-expression
-   54                          | multiplicative-expression mult cast-expression
-   55                          | multiplicative-expression div cast-expression
-
-   56 cast-expression: unary-expression
-   57                | openP type-name closeP cast-expression
-
-   58 unary-expression: postfix-expression
-   59                 | unary-operator cast-expression
-
-   60 postfix-expression: primary-expression
-   61                   | postfix-expression openK expression closeK
-
-   62 primary-expression: identifier
-   63                   | constant
-   64                   | string
-   65                   | openP expression closeP
-
-   66 constant: integer
-   67         | character
-   68         | floating
-
-   69 expression: assignment-expression
-   70           | expression comma assignment-expression
-
-   71 assignment-expression: conditional-expression
-   72                      | unary-expression assignment-operator assignment-expression
-
-   73 assignment-operator: eq
-   74                    | mult_eq
-   75                    | div_eq
-   76                    | plus_eq
-   77                    | minus_eq
-
-   78 unary-operator: %empty
-   79               | plus
-   80               | minus
-
-   81 abstract-declarator: openP abstract-declarator closeP
-   82                    | openK constant-expression closeK
-   83                    | abstract-declarator openK closeK
-   84                    | abstract-declarator openK constant-expression closeK
-   85                    | abstract-declarator openP parameter-type-list closeP
-   86                    | openP parameter-type-list closeP
-   87                    | abstract-declarator openP closeP
-
-   88 type-name: specifier-qualifier abstract-declarator
-
-   89 enum-specifier: enum identifier openB enumerator-list closeB
-   90               | enum openB enumerator-list closeB
-   91               | enum identifier
-
-   92 enumerator-list: enumerator
-   93                | enumerator-list comma enumerator
-
-   94 enumerator: identifier
-   95           | identifier eq constant-expression
-
-   96 typedef-name: identifier
-
-   97 init-declarator: declarator eq initializer
-
-   98 initializer: assignment-expression
-   99            | openB initializer-list closeB
-  100            | openB initializer-list comma closeB
-
-  101 initializer-list: initializer
-  102                 | initializer-list comma initializer
-
-  103 statement: selection-statement
-  104          | iteration-statement
-
-  105 expression-statement: expression endline
-
-  106 selection-statement: if openP expression closeP statement
-  107                    | if openP expression closeP statement else statement
-
-  108 iteration-statement: while openP expression closeP statement
-  109                    | for openP expression endline expression endline expression closeP statement
-
-  110 return-statement: return expression endline
-
-
-Rules useless in parser due to conflicts
-
-    9 direct-declarator: direct-declarator
-
-
-State 12 conflicts: 1 shift/reduce, 7 reduce/reduce
+State 78 conflicts: 2 shift/reduce, 1 reduce/reduce
+State 117 conflicts: 6 shift/reduce
+State 118 conflicts: 6 shift/reduce
+State 119 conflicts: 6 shift/reduce
+State 120 conflicts: 6 shift/reduce
+State 121 conflicts: 6 shift/reduce
+State 122 conflicts: 6 shift/reduce
 
 
 Grammar
 
-    0 $accept: function-definition $end
+    0 $accept: start $end
 
-    1 function-definition: declaration-specifier declarator declaration compound-statement
+    1 start: function-definition
+    2      | declaration
 
-    2 declaration-specifier: type-specifier
+    3 declaration: type-specifier direct-declarator SEMI
+    4            | direct-declarator SEMI
+    5            | function-reference SEMI
+    6            | parameter-list SEMI
+    7            | type-specifier parameter-list SEMI
+    8            | error
 
-    3 type-specifier: void
-    4               | char
-    5               | int
-    6               | float
+    9 direct-declarator: ID '=' direct-declarator
+   10                  | ID '=' function-reference
+   11                  | ID '=' parameter-list
+   12                  | parameter-list '=' direct-declarator
+   13                  | ID COMMA direct-declarator
+   14                  | NUM COMMA direct-declarator
+   15                  | ID PLUS direct-declarator
+   16                  | ID MINUS direct-declarator
+   17                  | ID MULT direct-declarator
+   18                  | ID DIV direct-declarator
+   19                  | NUM PLUS direct-declarator
+   20                  | NUM MINUS direct-declarator
+   21                  | NUM MULT direct-declarator
+   22                  | NUM DIV direct-declarator
+   23                  | '\'' direct-declarator '\''
+   24                  | '(' direct-declarator ')'
+   25                  | MINUS '(' direct-declarator ')'
+   26                  | MINUS NUM
+   27                  | MINUS ID
+   28                  | NUM
+   29                  | ID
 
-    7 declarator: direct-declarator
+   30 function-reference: ID '(' ')'
+   31                   | ID '(' direct-declarator ')'
 
-    8 direct-declarator: identifier
-    9                  | direct-declarator
-   10                  | direct-declarator openP multi-identifier closeP
-   11                  | direct-declarator openP parameter-type-list closeP
-   12                  | openP declarator closeP
+   32 parameter-list: ID '[' direct-declarator ']'
 
-   13 parameter-type-list: parameter-list
-   14                    | parameter-list comma
+   33 function-definition: type-specifier ID '(' initializer ')' compound-statement
 
-   15 parameter-list: parameter-declaration
-   16               | parameter-list comma parameter-declaration
+   34 initializer: initializer-lis
+   35            | %empty
 
-   17 parameter-declaration: declaration-specifier declarator
-   18                      | declaration-specifier
+   36 initializer-lis: initializer-lis COMMA declaration
+   37                | declaration
 
-   19 declaration: declaration-specifier init-declarator endline
+   38 declaration: type-specifier ID
 
-   20 init-declarator: declarator
+   39 compound-statement: '{' statement-list '}'
 
-   21 compound-statement: openB declaration statement closeB
+   40 statement-list: statement-list statement
+   41               | %empty
 
-   22 statement: expression-statement
-   23          | compound-statement
-   24          | return-statement
+   42 statement: iteration-statement
+   43          | declaration
+   44          | for-statement
+   45          | selection-statement
+   46          | print-statement
+   47          | SEMI
 
-   25 multi-identifier: %empty
-   26                 | identifier
+   48 type-specifier: INT
+   49               | FLOAT
+   50               | CHAR
+   51               | VOID
 
-   27 expression-statement: endline
+   52 iteration-statement: WHILE '(' expression ')' statement
+   53                    | WHILE '(' expression ')' compound-statement
 
-   28 return-statement: return endline
-   29                 | break endline
+   54 for-statement: FOR '(' expression SEMI expression SEMI expression ')' statement
+   55              | FOR '(' expression SEMI expression SEMI expression ')' compound-statement
+   56              | FOR '(' expression ')' statement
+   57              | FOR '(' expression ')' compound-statement
+
+   58 selection-statement: IF '(' expression ')' statement
+
+   59 print-statement: PRINTF '(' expression ')' SEMI
+
+   60 expression: expression LE expression
+   61           | expression GE expression
+   62           | expression NE expression
+   63           | expression EQ expression
+   64           | expression GT expression
+   65           | expression LT expression
+   66           | direct-declarator
+   67           | parameter-list
+   68           | %empty
 
 
 Terminals, with rules where they appear
 
     $end (0) 0
-    error (256)
-    char (258) 4
-    int (259) 5
-    float (260) 6
-    void (261) 3
-    if (262)
-    else (263)
-    while (264)
-    for (265)
-    return (266) 28
-    break (267) 29
-    not (268)
-    lesser (269)
-    greater (270)
-    leq (271)
-    plus (272)
-    minus (273)
-    mult (274)
-    div (275)
-    lnot_eq (276)
-    lesser_eq (277)
-    greater_eq (278)
-    eq (279)
-    and (280)
-    or (281)
-    land (282)
-    lor (283)
-    openB (284) 21
-    closeB (285) 21
-    openK (286)
-    closeK (287)
-    openP (288) 10 11 12
-    closeP (289) 10 11 12
-    mult_eq (290)
-    div_eq (291)
-    plus_eq (292)
-    minus_eq (293)
-    comma (294) 14 16
-    endline (295) 19 27 28 29
-    identifier (296) 8 26
-    string (297)
-    character (298)
-    integer (299)
-    floating (300)
-    enum (301)
+    '\'' (39) 23
+    '(' (40) 24 25 30 31 33 52 53 54 55 56 57 58 59
+    ')' (41) 24 25 30 31 33 52 53 54 55 56 57 58 59
+    '=' (61) 9 10 11 12
+    '[' (91) 32
+    ']' (93) 32
+    '{' (123) 39
+    '}' (125) 39
+    error (256) 8
+    INT (258) 48
+    FLOAT (259) 49
+    CHAR (260) 50
+    VOID (261) 51
+    FOR (262) 54 55 56 57
+    WHILE (263) 52 53
+    BREAK (264)
+    RETURN (265)
+    IF (266) 58
+    ELSE (267)
+    PRINTF (268) 59
+    NUM (269) 14 19 20 21 22 26 28
+    ID (270) 9 10 11 13 15 16 17 18 27 29 30 31 32 33 38
+    DOT (271)
+    COMMA (272) 13 14 36
+    SEMI (273) 3 4 5 6 7 47 54 55 59
+    OTHER (274)
+    AND (275)
+    OR (276)
+    LE (277) 60
+    GE (278) 61
+    NE (279) 62
+    LT (280) 65
+    GT (281) 64
+    PLUS (282) 15 19
+    MINUS (283) 16 20 25 26 27
+    MULT (284) 17 21
+    DIV (285) 18 22
+    EQ (286) 63
 
 
 Nonterminals, with rules where they appear
 
-    $accept (47)
+    $accept (40)
         on left: 0
-    function-definition (48)
-        on left: 1
+    start (41)
+        on left: 1 2
         on right: 0
-    declaration-specifier (49)
-        on left: 2
-        on right: 1 17 18 19
-    type-specifier (50)
-        on left: 3 4 5 6
-        on right: 2
-    declarator (51)
-        on left: 7
-        on right: 1 12 17 20
-    direct-declarator (52)
-        on left: 8 9 10 11 12
-        on right: 7 9 10 11
-    parameter-type-list (53)
-        on left: 13 14
-        on right: 11
-    parameter-list (54)
-        on left: 15 16
-        on right: 13 14 16
-    parameter-declaration (55)
-        on left: 17 18
-        on right: 15 16
-    declaration (56)
-        on left: 19
-        on right: 1 21
-    init-declarator (57)
-        on left: 20
-        on right: 19
-    compound-statement (58)
-        on left: 21
-        on right: 1 23
-    statement (59)
-        on left: 22 23 24
-        on right: 21
-    multi-identifier (60)
-        on left: 25 26
-        on right: 10
-    expression-statement (61)
-        on left: 27
-        on right: 22
-    return-statement (62)
-        on left: 28 29
-        on right: 24
+    declaration (42)
+        on left: 3 4 5 6 7 8 38
+        on right: 2 36 37 43
+    direct-declarator (43)
+        on left: 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29
+        on right: 3 4 9 12 13 14 15 16 17 18 19 20 21 22 23 24 25 31 32 66
+    function-reference (44)
+        on left: 30 31
+        on right: 5 10
+    parameter-list (45)
+        on left: 32
+        on right: 6 7 11 12 67
+    function-definition (46)
+        on left: 33
+        on right: 1
+    initializer (47)
+        on left: 34 35
+        on right: 33
+    initializer-lis (48)
+        on left: 36 37
+        on right: 34 36
+    compound-statement (49)
+        on left: 39
+        on right: 33 53 55 57
+    statement-list (50)
+        on left: 40 41
+        on right: 39 40
+    statement (51)
+        on left: 42 43 44 45 46 47
+        on right: 40 52 54 56 58
+    type-specifier (52)
+        on left: 48 49 50 51
+        on right: 3 7 33 38
+    iteration-statement (53)
+        on left: 52 53
+        on right: 42
+    for-statement (54)
+        on left: 54 55 56 57
+        on right: 44
+    selection-statement (55)
+        on left: 58
+        on right: 45
+    print-statement (56)
+        on left: 59
+        on right: 46
+    expression (57)
+        on left: 60 61 62 63 64 65 66 67 68
+        on right: 52 53 54 55 56 57 58 59 60 61 62 63 64 65
 
 
 State 0
 
-    0 $accept: . function-definition $end
+    0 $accept: . start $end
 
-    char   shift, and go to state 1
-    int    shift, and go to state 2
-    float  shift, and go to state 3
-    void   shift, and go to state 4
+    error  shift, and go to state 1
+    INT    shift, and go to state 2
+    FLOAT  shift, and go to state 3
+    CHAR   shift, and go to state 4
+    VOID   shift, and go to state 5
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 7
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
 
-    function-definition    go to state 5
-    declaration-specifier  go to state 6
-    type-specifier         go to state 7
+    start                go to state 11
+    declaration          go to state 12
+    direct-declarator    go to state 13
+    function-reference   go to state 14
+    parameter-list       go to state 15
+    function-definition  go to state 16
+    type-specifier       go to state 17
 
 
 State 1
 
-    4 type-specifier: char .
+    8 declaration: error .
 
-    $default  reduce using rule 4 (type-specifier)
+    $default  reduce using rule 8 (declaration)
 
 
 State 2
 
-    5 type-specifier: int .
+   48 type-specifier: INT .
 
-    $default  reduce using rule 5 (type-specifier)
+    $default  reduce using rule 48 (type-specifier)
 
 
 State 3
 
-    6 type-specifier: float .
+   49 type-specifier: FLOAT .
 
-    $default  reduce using rule 6 (type-specifier)
+    $default  reduce using rule 49 (type-specifier)
 
 
 State 4
 
-    3 type-specifier: void .
+   50 type-specifier: CHAR .
 
-    $default  reduce using rule 3 (type-specifier)
+    $default  reduce using rule 50 (type-specifier)
 
 
 State 5
 
-    0 $accept: function-definition . $end
+   51 type-specifier: VOID .
 
-    $end  shift, and go to state 8
+    $default  reduce using rule 51 (type-specifier)
 
 
 State 6
 
-    1 function-definition: declaration-specifier . declarator declaration compound-statement
+   14 direct-declarator: NUM . COMMA direct-declarator
+   19                  | NUM . PLUS direct-declarator
+   20                  | NUM . MINUS direct-declarator
+   21                  | NUM . MULT direct-declarator
+   22                  | NUM . DIV direct-declarator
+   28                  | NUM .
 
-    openP       shift, and go to state 9
-    identifier  shift, and go to state 10
+    COMMA  shift, and go to state 18
+    PLUS   shift, and go to state 19
+    MINUS  shift, and go to state 20
+    MULT   shift, and go to state 21
+    DIV    shift, and go to state 22
 
-    declarator         go to state 11
-    direct-declarator  go to state 12
+    $default  reduce using rule 28 (direct-declarator)
 
 
 State 7
 
-    2 declaration-specifier: type-specifier .
+    9 direct-declarator: ID . '=' direct-declarator
+   10                  | ID . '=' function-reference
+   11                  | ID . '=' parameter-list
+   13                  | ID . COMMA direct-declarator
+   15                  | ID . PLUS direct-declarator
+   16                  | ID . MINUS direct-declarator
+   17                  | ID . MULT direct-declarator
+   18                  | ID . DIV direct-declarator
+   29                  | ID .
+   30 function-reference: ID . '(' ')'
+   31                   | ID . '(' direct-declarator ')'
+   32 parameter-list: ID . '[' direct-declarator ']'
 
-    $default  reduce using rule 2 (declaration-specifier)
+    COMMA  shift, and go to state 23
+    '='    shift, and go to state 24
+    PLUS   shift, and go to state 25
+    MINUS  shift, and go to state 26
+    MULT   shift, and go to state 27
+    DIV    shift, and go to state 28
+    '('    shift, and go to state 29
+    '['    shift, and go to state 30
+
+    $default  reduce using rule 29 (direct-declarator)
 
 
 State 8
 
-    0 $accept: function-definition $end .
+   25 direct-declarator: MINUS . '(' direct-declarator ')'
+   26                  | MINUS . NUM
+   27                  | MINUS . ID
 
-    $default  accept
+    NUM  shift, and go to state 31
+    ID   shift, and go to state 32
+    '('  shift, and go to state 33
 
 
 State 9
 
-   12 direct-declarator: openP . declarator closeP
+   23 direct-declarator: '\'' . direct-declarator '\''
 
-    openP       shift, and go to state 9
-    identifier  shift, and go to state 10
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
 
-    declarator         go to state 13
-    direct-declarator  go to state 12
+    direct-declarator  go to state 35
+    parameter-list     go to state 36
 
 
 State 10
 
-    8 direct-declarator: identifier .
+   24 direct-declarator: '(' . direct-declarator ')'
 
-    $default  reduce using rule 8 (direct-declarator)
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    direct-declarator  go to state 37
+    parameter-list     go to state 36
 
 
 State 11
 
-    1 function-definition: declaration-specifier declarator . declaration compound-statement
+    0 $accept: start . $end
 
-    char   shift, and go to state 1
-    int    shift, and go to state 2
-    float  shift, and go to state 3
-    void   shift, and go to state 4
-
-    declaration-specifier  go to state 14
-    type-specifier         go to state 7
-    declaration            go to state 15
+    $end  shift, and go to state 38
 
 
 State 12
 
-    7 declarator: direct-declarator .
-    9 direct-declarator: direct-declarator .
-   10                  | direct-declarator . openP multi-identifier closeP
-   11                  | direct-declarator . openP parameter-type-list closeP
+    2 start: declaration .
 
-    openP  shift, and go to state 16
-
-    char      reduce using rule 7 (declarator)
-    char      [reduce using rule 9 (direct-declarator)]
-    int       reduce using rule 7 (declarator)
-    int       [reduce using rule 9 (direct-declarator)]
-    float     reduce using rule 7 (declarator)
-    float     [reduce using rule 9 (direct-declarator)]
-    void      reduce using rule 7 (declarator)
-    void      [reduce using rule 9 (direct-declarator)]
-    openP     [reduce using rule 9 (direct-declarator)]
-    closeP    reduce using rule 7 (declarator)
-    closeP    [reduce using rule 9 (direct-declarator)]
-    comma     reduce using rule 7 (declarator)
-    comma     [reduce using rule 9 (direct-declarator)]
-    endline   reduce using rule 7 (declarator)
-    endline   [reduce using rule 9 (direct-declarator)]
-    $default  reduce using rule 7 (declarator)
+    $default  reduce using rule 2 (start)
 
 
 State 13
 
-   12 direct-declarator: openP declarator . closeP
+    4 declaration: direct-declarator . SEMI
 
-    closeP  shift, and go to state 17
+    SEMI  shift, and go to state 39
 
 
 State 14
 
-   19 declaration: declaration-specifier . init-declarator endline
+    5 declaration: function-reference . SEMI
 
-    openP       shift, and go to state 9
-    identifier  shift, and go to state 10
-
-    declarator         go to state 18
-    direct-declarator  go to state 12
-    init-declarator    go to state 19
+    SEMI  shift, and go to state 40
 
 
 State 15
 
-    1 function-definition: declaration-specifier declarator declaration . compound-statement
+    6 declaration: parameter-list . SEMI
+   12 direct-declarator: parameter-list . '=' direct-declarator
 
-    openB  shift, and go to state 20
-
-    compound-statement  go to state 21
+    SEMI  shift, and go to state 41
+    '='   shift, and go to state 42
 
 
 State 16
 
-   10 direct-declarator: direct-declarator openP . multi-identifier closeP
-   11                  | direct-declarator openP . parameter-type-list closeP
+    1 start: function-definition .
 
-    char        shift, and go to state 1
-    int         shift, and go to state 2
-    float       shift, and go to state 3
-    void        shift, and go to state 4
-    identifier  shift, and go to state 22
-
-    $default  reduce using rule 25 (multi-identifier)
-
-    declaration-specifier  go to state 23
-    type-specifier         go to state 7
-    parameter-type-list    go to state 24
-    parameter-list         go to state 25
-    parameter-declaration  go to state 26
-    multi-identifier       go to state 27
+    $default  reduce using rule 1 (start)
 
 
 State 17
 
-   12 direct-declarator: openP declarator closeP .
+    3 declaration: type-specifier . direct-declarator SEMI
+    7            | type-specifier . parameter-list SEMI
+   33 function-definition: type-specifier . ID '(' initializer ')' compound-statement
+   38 declaration: type-specifier . ID
 
-    $default  reduce using rule 12 (direct-declarator)
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 43
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    direct-declarator  go to state 44
+    parameter-list     go to state 45
 
 
 State 18
 
-   20 init-declarator: declarator .
+   14 direct-declarator: NUM COMMA . direct-declarator
 
-    $default  reduce using rule 20 (init-declarator)
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    direct-declarator  go to state 46
+    parameter-list     go to state 36
 
 
 State 19
 
-   19 declaration: declaration-specifier init-declarator . endline
+   19 direct-declarator: NUM PLUS . direct-declarator
 
-    endline  shift, and go to state 28
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    direct-declarator  go to state 47
+    parameter-list     go to state 36
 
 
 State 20
 
-   21 compound-statement: openB . declaration statement closeB
+   20 direct-declarator: NUM MINUS . direct-declarator
 
-    char   shift, and go to state 1
-    int    shift, and go to state 2
-    float  shift, and go to state 3
-    void   shift, and go to state 4
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
 
-    declaration-specifier  go to state 14
-    type-specifier         go to state 7
-    declaration            go to state 29
+    direct-declarator  go to state 48
+    parameter-list     go to state 36
 
 
 State 21
 
-    1 function-definition: declaration-specifier declarator declaration compound-statement .
+   21 direct-declarator: NUM MULT . direct-declarator
 
-    $default  reduce using rule 1 (function-definition)
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    direct-declarator  go to state 49
+    parameter-list     go to state 36
 
 
 State 22
 
-   26 multi-identifier: identifier .
+   22 direct-declarator: NUM DIV . direct-declarator
 
-    $default  reduce using rule 26 (multi-identifier)
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    direct-declarator  go to state 50
+    parameter-list     go to state 36
 
 
 State 23
 
-   17 parameter-declaration: declaration-specifier . declarator
-   18                      | declaration-specifier .
+   13 direct-declarator: ID COMMA . direct-declarator
 
-    openP       shift, and go to state 9
-    identifier  shift, and go to state 10
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
 
-    $default  reduce using rule 18 (parameter-declaration)
-
-    declarator         go to state 30
-    direct-declarator  go to state 12
+    direct-declarator  go to state 51
+    parameter-list     go to state 36
 
 
 State 24
 
-   11 direct-declarator: direct-declarator openP parameter-type-list . closeP
+    9 direct-declarator: ID '=' . direct-declarator
+   10                  | ID '=' . function-reference
+   11                  | ID '=' . parameter-list
 
-    closeP  shift, and go to state 31
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 7
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    direct-declarator   go to state 52
+    function-reference  go to state 53
+    parameter-list      go to state 54
 
 
 State 25
 
-   13 parameter-type-list: parameter-list .
-   14                    | parameter-list . comma
-   16 parameter-list: parameter-list . comma parameter-declaration
+   15 direct-declarator: ID PLUS . direct-declarator
 
-    comma  shift, and go to state 32
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
 
-    $default  reduce using rule 13 (parameter-type-list)
+    direct-declarator  go to state 55
+    parameter-list     go to state 36
 
 
 State 26
 
-   15 parameter-list: parameter-declaration .
+   16 direct-declarator: ID MINUS . direct-declarator
 
-    $default  reduce using rule 15 (parameter-list)
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    direct-declarator  go to state 56
+    parameter-list     go to state 36
 
 
 State 27
 
-   10 direct-declarator: direct-declarator openP multi-identifier . closeP
+   17 direct-declarator: ID MULT . direct-declarator
 
-    closeP  shift, and go to state 33
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    direct-declarator  go to state 57
+    parameter-list     go to state 36
 
 
 State 28
 
-   19 declaration: declaration-specifier init-declarator endline .
+   18 direct-declarator: ID DIV . direct-declarator
 
-    $default  reduce using rule 19 (declaration)
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    direct-declarator  go to state 58
+    parameter-list     go to state 36
 
 
 State 29
 
-   21 compound-statement: openB declaration . statement closeB
+   30 function-reference: ID '(' . ')'
+   31                   | ID '(' . direct-declarator ')'
 
-    return   shift, and go to state 34
-    break    shift, and go to state 35
-    openB    shift, and go to state 20
-    endline  shift, and go to state 36
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+    ')'    shift, and go to state 59
 
-    compound-statement    go to state 37
-    statement             go to state 38
-    expression-statement  go to state 39
-    return-statement      go to state 40
+    direct-declarator  go to state 60
+    parameter-list     go to state 36
 
 
 State 30
 
-   17 parameter-declaration: declaration-specifier declarator .
+   32 parameter-list: ID '[' . direct-declarator ']'
 
-    $default  reduce using rule 17 (parameter-declaration)
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    direct-declarator  go to state 61
+    parameter-list     go to state 36
 
 
 State 31
 
-   11 direct-declarator: direct-declarator openP parameter-type-list closeP .
+   26 direct-declarator: MINUS NUM .
 
-    $default  reduce using rule 11 (direct-declarator)
+    $default  reduce using rule 26 (direct-declarator)
 
 
 State 32
 
-   14 parameter-type-list: parameter-list comma .
-   16 parameter-list: parameter-list comma . parameter-declaration
+   27 direct-declarator: MINUS ID .
 
-    char   shift, and go to state 1
-    int    shift, and go to state 2
-    float  shift, and go to state 3
-    void   shift, and go to state 4
-
-    $default  reduce using rule 14 (parameter-type-list)
-
-    declaration-specifier  go to state 23
-    type-specifier         go to state 7
-    parameter-declaration  go to state 41
+    $default  reduce using rule 27 (direct-declarator)
 
 
 State 33
 
-   10 direct-declarator: direct-declarator openP multi-identifier closeP .
+   25 direct-declarator: MINUS '(' . direct-declarator ')'
 
-    $default  reduce using rule 10 (direct-declarator)
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    direct-declarator  go to state 62
+    parameter-list     go to state 36
 
 
 State 34
 
-   28 return-statement: return . endline
+    9 direct-declarator: ID . '=' direct-declarator
+   10                  | ID . '=' function-reference
+   11                  | ID . '=' parameter-list
+   13                  | ID . COMMA direct-declarator
+   15                  | ID . PLUS direct-declarator
+   16                  | ID . MINUS direct-declarator
+   17                  | ID . MULT direct-declarator
+   18                  | ID . DIV direct-declarator
+   29                  | ID .
+   32 parameter-list: ID . '[' direct-declarator ']'
 
-    endline  shift, and go to state 42
+    COMMA  shift, and go to state 23
+    '='    shift, and go to state 24
+    PLUS   shift, and go to state 25
+    MINUS  shift, and go to state 26
+    MULT   shift, and go to state 27
+    DIV    shift, and go to state 28
+    '['    shift, and go to state 30
+
+    $default  reduce using rule 29 (direct-declarator)
 
 
 State 35
 
-   29 return-statement: break . endline
+   23 direct-declarator: '\'' direct-declarator . '\''
 
-    endline  shift, and go to state 43
+    '\''  shift, and go to state 63
 
 
 State 36
 
-   27 expression-statement: endline .
+   12 direct-declarator: parameter-list . '=' direct-declarator
 
-    $default  reduce using rule 27 (expression-statement)
+    '='  shift, and go to state 42
 
 
 State 37
 
-   23 statement: compound-statement .
+   24 direct-declarator: '(' direct-declarator . ')'
 
-    $default  reduce using rule 23 (statement)
+    ')'  shift, and go to state 64
 
 
 State 38
 
-   21 compound-statement: openB declaration statement . closeB
+    0 $accept: start $end .
 
-    closeB  shift, and go to state 44
+    $default  accept
 
 
 State 39
 
-   22 statement: expression-statement .
+    4 declaration: direct-declarator SEMI .
 
-    $default  reduce using rule 22 (statement)
+    $default  reduce using rule 4 (declaration)
 
 
 State 40
 
-   24 statement: return-statement .
+    5 declaration: function-reference SEMI .
 
-    $default  reduce using rule 24 (statement)
+    $default  reduce using rule 5 (declaration)
 
 
 State 41
 
-   16 parameter-list: parameter-list comma parameter-declaration .
+    6 declaration: parameter-list SEMI .
 
-    $default  reduce using rule 16 (parameter-list)
+    $default  reduce using rule 6 (declaration)
 
 
 State 42
 
-   28 return-statement: return endline .
+   12 direct-declarator: parameter-list '=' . direct-declarator
 
-    $default  reduce using rule 28 (return-statement)
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    direct-declarator  go to state 65
+    parameter-list     go to state 36
 
 
 State 43
 
-   29 return-statement: break endline .
+    9 direct-declarator: ID . '=' direct-declarator
+   10                  | ID . '=' function-reference
+   11                  | ID . '=' parameter-list
+   13                  | ID . COMMA direct-declarator
+   15                  | ID . PLUS direct-declarator
+   16                  | ID . MINUS direct-declarator
+   17                  | ID . MULT direct-declarator
+   18                  | ID . DIV direct-declarator
+   29                  | ID .
+   32 parameter-list: ID . '[' direct-declarator ']'
+   33 function-definition: type-specifier ID . '(' initializer ')' compound-statement
+   38 declaration: type-specifier ID .
 
-    $default  reduce using rule 29 (return-statement)
+    COMMA  shift, and go to state 23
+    '='    shift, and go to state 24
+    PLUS   shift, and go to state 25
+    MINUS  shift, and go to state 26
+    MULT   shift, and go to state 27
+    DIV    shift, and go to state 28
+    '('    shift, and go to state 66
+    '['    shift, and go to state 30
+
+    $end      reduce using rule 38 (declaration)
+    $default  reduce using rule 29 (direct-declarator)
 
 
 State 44
 
-   21 compound-statement: openB declaration statement closeB .
+    3 declaration: type-specifier direct-declarator . SEMI
 
-    $default  reduce using rule 21 (compound-statement)
+    SEMI  shift, and go to state 67
+
+
+State 45
+
+    7 declaration: type-specifier parameter-list . SEMI
+   12 direct-declarator: parameter-list . '=' direct-declarator
+
+    SEMI  shift, and go to state 68
+    '='   shift, and go to state 42
+
+
+State 46
+
+   14 direct-declarator: NUM COMMA direct-declarator .
+
+    $default  reduce using rule 14 (direct-declarator)
+
+
+State 47
+
+   19 direct-declarator: NUM PLUS direct-declarator .
+
+    $default  reduce using rule 19 (direct-declarator)
+
+
+State 48
+
+   20 direct-declarator: NUM MINUS direct-declarator .
+
+    $default  reduce using rule 20 (direct-declarator)
+
+
+State 49
+
+   21 direct-declarator: NUM MULT direct-declarator .
+
+    $default  reduce using rule 21 (direct-declarator)
+
+
+State 50
+
+   22 direct-declarator: NUM DIV direct-declarator .
+
+    $default  reduce using rule 22 (direct-declarator)
+
+
+State 51
+
+   13 direct-declarator: ID COMMA direct-declarator .
+
+    $default  reduce using rule 13 (direct-declarator)
+
+
+State 52
+
+    9 direct-declarator: ID '=' direct-declarator .
+
+    $default  reduce using rule 9 (direct-declarator)
+
+
+State 53
+
+   10 direct-declarator: ID '=' function-reference .
+
+    $default  reduce using rule 10 (direct-declarator)
+
+
+State 54
+
+   11 direct-declarator: ID '=' parameter-list .
+   12                  | parameter-list . '=' direct-declarator
+
+    '='  shift, and go to state 42
+
+    $default  reduce using rule 11 (direct-declarator)
+
+
+State 55
+
+   15 direct-declarator: ID PLUS direct-declarator .
+
+    $default  reduce using rule 15 (direct-declarator)
+
+
+State 56
+
+   16 direct-declarator: ID MINUS direct-declarator .
+
+    $default  reduce using rule 16 (direct-declarator)
+
+
+State 57
+
+   17 direct-declarator: ID MULT direct-declarator .
+
+    $default  reduce using rule 17 (direct-declarator)
+
+
+State 58
+
+   18 direct-declarator: ID DIV direct-declarator .
+
+    $default  reduce using rule 18 (direct-declarator)
+
+
+State 59
+
+   30 function-reference: ID '(' ')' .
+
+    $default  reduce using rule 30 (function-reference)
+
+
+State 60
+
+   31 function-reference: ID '(' direct-declarator . ')'
+
+    ')'  shift, and go to state 69
+
+
+State 61
+
+   32 parameter-list: ID '[' direct-declarator . ']'
+
+    ']'  shift, and go to state 70
+
+
+State 62
+
+   25 direct-declarator: MINUS '(' direct-declarator . ')'
+
+    ')'  shift, and go to state 71
+
+
+State 63
+
+   23 direct-declarator: '\'' direct-declarator '\'' .
+
+    $default  reduce using rule 23 (direct-declarator)
+
+
+State 64
+
+   24 direct-declarator: '(' direct-declarator ')' .
+
+    $default  reduce using rule 24 (direct-declarator)
+
+
+State 65
+
+   12 direct-declarator: parameter-list '=' direct-declarator .
+
+    $default  reduce using rule 12 (direct-declarator)
+
+
+State 66
+
+   33 function-definition: type-specifier ID '(' . initializer ')' compound-statement
+
+    error  shift, and go to state 1
+    INT    shift, and go to state 2
+    FLOAT  shift, and go to state 3
+    CHAR   shift, and go to state 4
+    VOID   shift, and go to state 5
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 7
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    ')'  reduce using rule 35 (initializer)
+
+    declaration         go to state 72
+    direct-declarator   go to state 13
+    function-reference  go to state 14
+    parameter-list      go to state 15
+    initializer         go to state 73
+    initializer-lis     go to state 74
+    type-specifier      go to state 75
+
+
+State 67
+
+    3 declaration: type-specifier direct-declarator SEMI .
+
+    $default  reduce using rule 3 (declaration)
+
+
+State 68
+
+    7 declaration: type-specifier parameter-list SEMI .
+
+    $default  reduce using rule 7 (declaration)
+
+
+State 69
+
+   31 function-reference: ID '(' direct-declarator ')' .
+
+    $default  reduce using rule 31 (function-reference)
+
+
+State 70
+
+   32 parameter-list: ID '[' direct-declarator ']' .
+
+    $default  reduce using rule 32 (parameter-list)
+
+
+State 71
+
+   25 direct-declarator: MINUS '(' direct-declarator ')' .
+
+    $default  reduce using rule 25 (direct-declarator)
+
+
+State 72
+
+   37 initializer-lis: declaration .
+
+    $default  reduce using rule 37 (initializer-lis)
+
+
+State 73
+
+   33 function-definition: type-specifier ID '(' initializer . ')' compound-statement
+
+    ')'  shift, and go to state 76
+
+
+State 74
+
+   34 initializer: initializer-lis .
+   36 initializer-lis: initializer-lis . COMMA declaration
+
+    COMMA  shift, and go to state 77
+
+    $default  reduce using rule 34 (initializer)
+
+
+State 75
+
+    3 declaration: type-specifier . direct-declarator SEMI
+    7            | type-specifier . parameter-list SEMI
+   38            | type-specifier . ID
+
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 78
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    direct-declarator  go to state 44
+    parameter-list     go to state 45
+
+
+State 76
+
+   33 function-definition: type-specifier ID '(' initializer ')' . compound-statement
+
+    '{'  shift, and go to state 79
+
+    compound-statement  go to state 80
+
+
+State 77
+
+   36 initializer-lis: initializer-lis COMMA . declaration
+
+    error  shift, and go to state 1
+    INT    shift, and go to state 2
+    FLOAT  shift, and go to state 3
+    CHAR   shift, and go to state 4
+    VOID   shift, and go to state 5
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 7
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    declaration         go to state 81
+    direct-declarator   go to state 13
+    function-reference  go to state 14
+    parameter-list      go to state 15
+    type-specifier      go to state 75
+
+
+State 78
+
+    9 direct-declarator: ID . '=' direct-declarator
+   10                  | ID . '=' function-reference
+   11                  | ID . '=' parameter-list
+   13                  | ID . COMMA direct-declarator
+   15                  | ID . PLUS direct-declarator
+   16                  | ID . MINUS direct-declarator
+   17                  | ID . MULT direct-declarator
+   18                  | ID . DIV direct-declarator
+   29                  | ID .
+   32 parameter-list: ID . '[' direct-declarator ']'
+   38 declaration: type-specifier ID .
+
+    COMMA  shift, and go to state 23
+    '='    shift, and go to state 24
+    PLUS   shift, and go to state 25
+    MINUS  shift, and go to state 26
+    MULT   shift, and go to state 27
+    DIV    shift, and go to state 28
+    '['    shift, and go to state 30
+
+    COMMA     [reduce using rule 38 (declaration)]
+    SEMI      reduce using rule 29 (direct-declarator)
+    SEMI      [reduce using rule 38 (declaration)]
+    MINUS     [reduce using rule 38 (declaration)]
+    $default  reduce using rule 38 (declaration)
+
+
+State 79
+
+   39 compound-statement: '{' . statement-list '}'
+
+    $default  reduce using rule 41 (statement-list)
+
+    statement-list  go to state 82
+
+
+State 80
+
+   33 function-definition: type-specifier ID '(' initializer ')' compound-statement .
+
+    $default  reduce using rule 33 (function-definition)
+
+
+State 81
+
+   36 initializer-lis: initializer-lis COMMA declaration .
+
+    $default  reduce using rule 36 (initializer-lis)
+
+
+State 82
+
+   39 compound-statement: '{' statement-list . '}'
+   40 statement-list: statement-list . statement
+
+    error   shift, and go to state 1
+    INT     shift, and go to state 2
+    FLOAT   shift, and go to state 3
+    CHAR    shift, and go to state 4
+    VOID    shift, and go to state 5
+    FOR     shift, and go to state 83
+    WHILE   shift, and go to state 84
+    IF      shift, and go to state 85
+    PRINTF  shift, and go to state 86
+    NUM     shift, and go to state 6
+    ID      shift, and go to state 7
+    SEMI    shift, and go to state 87
+    MINUS   shift, and go to state 8
+    '\''    shift, and go to state 9
+    '('     shift, and go to state 10
+    '}'     shift, and go to state 88
+
+    declaration          go to state 89
+    direct-declarator    go to state 13
+    function-reference   go to state 14
+    parameter-list       go to state 15
+    statement            go to state 90
+    type-specifier       go to state 75
+    iteration-statement  go to state 91
+    for-statement        go to state 92
+    selection-statement  go to state 93
+    print-statement      go to state 94
+
+
+State 83
+
+   54 for-statement: FOR . '(' expression SEMI expression SEMI expression ')' statement
+   55              | FOR . '(' expression SEMI expression SEMI expression ')' compound-statement
+   56              | FOR . '(' expression ')' statement
+   57              | FOR . '(' expression ')' compound-statement
+
+    '('  shift, and go to state 95
+
+
+State 84
+
+   52 iteration-statement: WHILE . '(' expression ')' statement
+   53                    | WHILE . '(' expression ')' compound-statement
+
+    '('  shift, and go to state 96
+
+
+State 85
+
+   58 selection-statement: IF . '(' expression ')' statement
+
+    '('  shift, and go to state 97
+
+
+State 86
+
+   59 print-statement: PRINTF . '(' expression ')' SEMI
+
+    '('  shift, and go to state 98
+
+
+State 87
+
+   47 statement: SEMI .
+
+    $default  reduce using rule 47 (statement)
+
+
+State 88
+
+   39 compound-statement: '{' statement-list '}' .
+
+    $default  reduce using rule 39 (compound-statement)
+
+
+State 89
+
+   43 statement: declaration .
+
+    $default  reduce using rule 43 (statement)
+
+
+State 90
+
+   40 statement-list: statement-list statement .
+
+    $default  reduce using rule 40 (statement-list)
+
+
+State 91
+
+   42 statement: iteration-statement .
+
+    $default  reduce using rule 42 (statement)
+
+
+State 92
+
+   44 statement: for-statement .
+
+    $default  reduce using rule 44 (statement)
+
+
+State 93
+
+   45 statement: selection-statement .
+
+    $default  reduce using rule 45 (statement)
+
+
+State 94
+
+   46 statement: print-statement .
+
+    $default  reduce using rule 46 (statement)
+
+
+State 95
+
+   54 for-statement: FOR '(' . expression SEMI expression SEMI expression ')' statement
+   55              | FOR '(' . expression SEMI expression SEMI expression ')' compound-statement
+   56              | FOR '(' . expression ')' statement
+   57              | FOR '(' . expression ')' compound-statement
+
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    $default  reduce using rule 68 (expression)
+
+    direct-declarator  go to state 99
+    parameter-list     go to state 100
+    expression         go to state 101
+
+
+State 96
+
+   52 iteration-statement: WHILE '(' . expression ')' statement
+   53                    | WHILE '(' . expression ')' compound-statement
+
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    $default  reduce using rule 68 (expression)
+
+    direct-declarator  go to state 99
+    parameter-list     go to state 100
+    expression         go to state 102
+
+
+State 97
+
+   58 selection-statement: IF '(' . expression ')' statement
+
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    $default  reduce using rule 68 (expression)
+
+    direct-declarator  go to state 99
+    parameter-list     go to state 100
+    expression         go to state 103
+
+
+State 98
+
+   59 print-statement: PRINTF '(' . expression ')' SEMI
+
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    $default  reduce using rule 68 (expression)
+
+    direct-declarator  go to state 99
+    parameter-list     go to state 100
+    expression         go to state 104
+
+
+State 99
+
+   66 expression: direct-declarator .
+
+    $default  reduce using rule 66 (expression)
+
+
+State 100
+
+   12 direct-declarator: parameter-list . '=' direct-declarator
+   67 expression: parameter-list .
+
+    '='  shift, and go to state 42
+
+    $default  reduce using rule 67 (expression)
+
+
+State 101
+
+   54 for-statement: FOR '(' expression . SEMI expression SEMI expression ')' statement
+   55              | FOR '(' expression . SEMI expression SEMI expression ')' compound-statement
+   56              | FOR '(' expression . ')' statement
+   57              | FOR '(' expression . ')' compound-statement
+   60 expression: expression . LE expression
+   61           | expression . GE expression
+   62           | expression . NE expression
+   63           | expression . EQ expression
+   64           | expression . GT expression
+   65           | expression . LT expression
+
+    SEMI  shift, and go to state 105
+    LE    shift, and go to state 106
+    GE    shift, and go to state 107
+    NE    shift, and go to state 108
+    LT    shift, and go to state 109
+    GT    shift, and go to state 110
+    EQ    shift, and go to state 111
+    ')'   shift, and go to state 112
+
+
+State 102
+
+   52 iteration-statement: WHILE '(' expression . ')' statement
+   53                    | WHILE '(' expression . ')' compound-statement
+   60 expression: expression . LE expression
+   61           | expression . GE expression
+   62           | expression . NE expression
+   63           | expression . EQ expression
+   64           | expression . GT expression
+   65           | expression . LT expression
+
+    LE   shift, and go to state 106
+    GE   shift, and go to state 107
+    NE   shift, and go to state 108
+    LT   shift, and go to state 109
+    GT   shift, and go to state 110
+    EQ   shift, and go to state 111
+    ')'  shift, and go to state 113
+
+
+State 103
+
+   58 selection-statement: IF '(' expression . ')' statement
+   60 expression: expression . LE expression
+   61           | expression . GE expression
+   62           | expression . NE expression
+   63           | expression . EQ expression
+   64           | expression . GT expression
+   65           | expression . LT expression
+
+    LE   shift, and go to state 106
+    GE   shift, and go to state 107
+    NE   shift, and go to state 108
+    LT   shift, and go to state 109
+    GT   shift, and go to state 110
+    EQ   shift, and go to state 111
+    ')'  shift, and go to state 114
+
+
+State 104
+
+   59 print-statement: PRINTF '(' expression . ')' SEMI
+   60 expression: expression . LE expression
+   61           | expression . GE expression
+   62           | expression . NE expression
+   63           | expression . EQ expression
+   64           | expression . GT expression
+   65           | expression . LT expression
+
+    LE   shift, and go to state 106
+    GE   shift, and go to state 107
+    NE   shift, and go to state 108
+    LT   shift, and go to state 109
+    GT   shift, and go to state 110
+    EQ   shift, and go to state 111
+    ')'  shift, and go to state 115
+
+
+State 105
+
+   54 for-statement: FOR '(' expression SEMI . expression SEMI expression ')' statement
+   55              | FOR '(' expression SEMI . expression SEMI expression ')' compound-statement
+
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    $default  reduce using rule 68 (expression)
+
+    direct-declarator  go to state 99
+    parameter-list     go to state 100
+    expression         go to state 116
+
+
+State 106
+
+   60 expression: expression LE . expression
+
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    $default  reduce using rule 68 (expression)
+
+    direct-declarator  go to state 99
+    parameter-list     go to state 100
+    expression         go to state 117
+
+
+State 107
+
+   61 expression: expression GE . expression
+
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    $default  reduce using rule 68 (expression)
+
+    direct-declarator  go to state 99
+    parameter-list     go to state 100
+    expression         go to state 118
+
+
+State 108
+
+   62 expression: expression NE . expression
+
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    $default  reduce using rule 68 (expression)
+
+    direct-declarator  go to state 99
+    parameter-list     go to state 100
+    expression         go to state 119
+
+
+State 109
+
+   65 expression: expression LT . expression
+
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    $default  reduce using rule 68 (expression)
+
+    direct-declarator  go to state 99
+    parameter-list     go to state 100
+    expression         go to state 120
+
+
+State 110
+
+   64 expression: expression GT . expression
+
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    $default  reduce using rule 68 (expression)
+
+    direct-declarator  go to state 99
+    parameter-list     go to state 100
+    expression         go to state 121
+
+
+State 111
+
+   63 expression: expression EQ . expression
+
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    $default  reduce using rule 68 (expression)
+
+    direct-declarator  go to state 99
+    parameter-list     go to state 100
+    expression         go to state 122
+
+
+State 112
+
+   56 for-statement: FOR '(' expression ')' . statement
+   57              | FOR '(' expression ')' . compound-statement
+
+    error   shift, and go to state 1
+    INT     shift, and go to state 2
+    FLOAT   shift, and go to state 3
+    CHAR    shift, and go to state 4
+    VOID    shift, and go to state 5
+    FOR     shift, and go to state 83
+    WHILE   shift, and go to state 84
+    IF      shift, and go to state 85
+    PRINTF  shift, and go to state 86
+    NUM     shift, and go to state 6
+    ID      shift, and go to state 7
+    SEMI    shift, and go to state 87
+    MINUS   shift, and go to state 8
+    '\''    shift, and go to state 9
+    '('     shift, and go to state 10
+    '{'     shift, and go to state 79
+
+    declaration          go to state 89
+    direct-declarator    go to state 13
+    function-reference   go to state 14
+    parameter-list       go to state 15
+    compound-statement   go to state 123
+    statement            go to state 124
+    type-specifier       go to state 75
+    iteration-statement  go to state 91
+    for-statement        go to state 92
+    selection-statement  go to state 93
+    print-statement      go to state 94
+
+
+State 113
+
+   52 iteration-statement: WHILE '(' expression ')' . statement
+   53                    | WHILE '(' expression ')' . compound-statement
+
+    error   shift, and go to state 1
+    INT     shift, and go to state 2
+    FLOAT   shift, and go to state 3
+    CHAR    shift, and go to state 4
+    VOID    shift, and go to state 5
+    FOR     shift, and go to state 83
+    WHILE   shift, and go to state 84
+    IF      shift, and go to state 85
+    PRINTF  shift, and go to state 86
+    NUM     shift, and go to state 6
+    ID      shift, and go to state 7
+    SEMI    shift, and go to state 87
+    MINUS   shift, and go to state 8
+    '\''    shift, and go to state 9
+    '('     shift, and go to state 10
+    '{'     shift, and go to state 79
+
+    declaration          go to state 89
+    direct-declarator    go to state 13
+    function-reference   go to state 14
+    parameter-list       go to state 15
+    compound-statement   go to state 125
+    statement            go to state 126
+    type-specifier       go to state 75
+    iteration-statement  go to state 91
+    for-statement        go to state 92
+    selection-statement  go to state 93
+    print-statement      go to state 94
+
+
+State 114
+
+   58 selection-statement: IF '(' expression ')' . statement
+
+    error   shift, and go to state 1
+    INT     shift, and go to state 2
+    FLOAT   shift, and go to state 3
+    CHAR    shift, and go to state 4
+    VOID    shift, and go to state 5
+    FOR     shift, and go to state 83
+    WHILE   shift, and go to state 84
+    IF      shift, and go to state 85
+    PRINTF  shift, and go to state 86
+    NUM     shift, and go to state 6
+    ID      shift, and go to state 7
+    SEMI    shift, and go to state 87
+    MINUS   shift, and go to state 8
+    '\''    shift, and go to state 9
+    '('     shift, and go to state 10
+
+    declaration          go to state 89
+    direct-declarator    go to state 13
+    function-reference   go to state 14
+    parameter-list       go to state 15
+    statement            go to state 127
+    type-specifier       go to state 75
+    iteration-statement  go to state 91
+    for-statement        go to state 92
+    selection-statement  go to state 93
+    print-statement      go to state 94
+
+
+State 115
+
+   59 print-statement: PRINTF '(' expression ')' . SEMI
+
+    SEMI  shift, and go to state 128
+
+
+State 116
+
+   54 for-statement: FOR '(' expression SEMI expression . SEMI expression ')' statement
+   55              | FOR '(' expression SEMI expression . SEMI expression ')' compound-statement
+   60 expression: expression . LE expression
+   61           | expression . GE expression
+   62           | expression . NE expression
+   63           | expression . EQ expression
+   64           | expression . GT expression
+   65           | expression . LT expression
+
+    SEMI  shift, and go to state 129
+    LE    shift, and go to state 106
+    GE    shift, and go to state 107
+    NE    shift, and go to state 108
+    LT    shift, and go to state 109
+    GT    shift, and go to state 110
+    EQ    shift, and go to state 111
+
+
+State 117
+
+   60 expression: expression . LE expression
+   60           | expression LE expression .
+   61           | expression . GE expression
+   62           | expression . NE expression
+   63           | expression . EQ expression
+   64           | expression . GT expression
+   65           | expression . LT expression
+
+    LE  shift, and go to state 106
+    GE  shift, and go to state 107
+    NE  shift, and go to state 108
+    LT  shift, and go to state 109
+    GT  shift, and go to state 110
+    EQ  shift, and go to state 111
+
+    LE        [reduce using rule 60 (expression)]
+    GE        [reduce using rule 60 (expression)]
+    NE        [reduce using rule 60 (expression)]
+    LT        [reduce using rule 60 (expression)]
+    GT        [reduce using rule 60 (expression)]
+    EQ        [reduce using rule 60 (expression)]
+    $default  reduce using rule 60 (expression)
+
+
+State 118
+
+   60 expression: expression . LE expression
+   61           | expression . GE expression
+   61           | expression GE expression .
+   62           | expression . NE expression
+   63           | expression . EQ expression
+   64           | expression . GT expression
+   65           | expression . LT expression
+
+    LE  shift, and go to state 106
+    GE  shift, and go to state 107
+    NE  shift, and go to state 108
+    LT  shift, and go to state 109
+    GT  shift, and go to state 110
+    EQ  shift, and go to state 111
+
+    LE        [reduce using rule 61 (expression)]
+    GE        [reduce using rule 61 (expression)]
+    NE        [reduce using rule 61 (expression)]
+    LT        [reduce using rule 61 (expression)]
+    GT        [reduce using rule 61 (expression)]
+    EQ        [reduce using rule 61 (expression)]
+    $default  reduce using rule 61 (expression)
+
+
+State 119
+
+   60 expression: expression . LE expression
+   61           | expression . GE expression
+   62           | expression . NE expression
+   62           | expression NE expression .
+   63           | expression . EQ expression
+   64           | expression . GT expression
+   65           | expression . LT expression
+
+    LE  shift, and go to state 106
+    GE  shift, and go to state 107
+    NE  shift, and go to state 108
+    LT  shift, and go to state 109
+    GT  shift, and go to state 110
+    EQ  shift, and go to state 111
+
+    LE        [reduce using rule 62 (expression)]
+    GE        [reduce using rule 62 (expression)]
+    NE        [reduce using rule 62 (expression)]
+    LT        [reduce using rule 62 (expression)]
+    GT        [reduce using rule 62 (expression)]
+    EQ        [reduce using rule 62 (expression)]
+    $default  reduce using rule 62 (expression)
+
+
+State 120
+
+   60 expression: expression . LE expression
+   61           | expression . GE expression
+   62           | expression . NE expression
+   63           | expression . EQ expression
+   64           | expression . GT expression
+   65           | expression . LT expression
+   65           | expression LT expression .
+
+    LE  shift, and go to state 106
+    GE  shift, and go to state 107
+    NE  shift, and go to state 108
+    LT  shift, and go to state 109
+    GT  shift, and go to state 110
+    EQ  shift, and go to state 111
+
+    LE        [reduce using rule 65 (expression)]
+    GE        [reduce using rule 65 (expression)]
+    NE        [reduce using rule 65 (expression)]
+    LT        [reduce using rule 65 (expression)]
+    GT        [reduce using rule 65 (expression)]
+    EQ        [reduce using rule 65 (expression)]
+    $default  reduce using rule 65 (expression)
+
+
+State 121
+
+   60 expression: expression . LE expression
+   61           | expression . GE expression
+   62           | expression . NE expression
+   63           | expression . EQ expression
+   64           | expression . GT expression
+   64           | expression GT expression .
+   65           | expression . LT expression
+
+    LE  shift, and go to state 106
+    GE  shift, and go to state 107
+    NE  shift, and go to state 108
+    LT  shift, and go to state 109
+    GT  shift, and go to state 110
+    EQ  shift, and go to state 111
+
+    LE        [reduce using rule 64 (expression)]
+    GE        [reduce using rule 64 (expression)]
+    NE        [reduce using rule 64 (expression)]
+    LT        [reduce using rule 64 (expression)]
+    GT        [reduce using rule 64 (expression)]
+    EQ        [reduce using rule 64 (expression)]
+    $default  reduce using rule 64 (expression)
+
+
+State 122
+
+   60 expression: expression . LE expression
+   61           | expression . GE expression
+   62           | expression . NE expression
+   63           | expression . EQ expression
+   63           | expression EQ expression .
+   64           | expression . GT expression
+   65           | expression . LT expression
+
+    LE  shift, and go to state 106
+    GE  shift, and go to state 107
+    NE  shift, and go to state 108
+    LT  shift, and go to state 109
+    GT  shift, and go to state 110
+    EQ  shift, and go to state 111
+
+    LE        [reduce using rule 63 (expression)]
+    GE        [reduce using rule 63 (expression)]
+    NE        [reduce using rule 63 (expression)]
+    LT        [reduce using rule 63 (expression)]
+    GT        [reduce using rule 63 (expression)]
+    EQ        [reduce using rule 63 (expression)]
+    $default  reduce using rule 63 (expression)
+
+
+State 123
+
+   57 for-statement: FOR '(' expression ')' compound-statement .
+
+    $default  reduce using rule 57 (for-statement)
+
+
+State 124
+
+   56 for-statement: FOR '(' expression ')' statement .
+
+    $default  reduce using rule 56 (for-statement)
+
+
+State 125
+
+   53 iteration-statement: WHILE '(' expression ')' compound-statement .
+
+    $default  reduce using rule 53 (iteration-statement)
+
+
+State 126
+
+   52 iteration-statement: WHILE '(' expression ')' statement .
+
+    $default  reduce using rule 52 (iteration-statement)
+
+
+State 127
+
+   58 selection-statement: IF '(' expression ')' statement .
+
+    $default  reduce using rule 58 (selection-statement)
+
+
+State 128
+
+   59 print-statement: PRINTF '(' expression ')' SEMI .
+
+    $default  reduce using rule 59 (print-statement)
+
+
+State 129
+
+   54 for-statement: FOR '(' expression SEMI expression SEMI . expression ')' statement
+   55              | FOR '(' expression SEMI expression SEMI . expression ')' compound-statement
+
+    NUM    shift, and go to state 6
+    ID     shift, and go to state 34
+    MINUS  shift, and go to state 8
+    '\''   shift, and go to state 9
+    '('    shift, and go to state 10
+
+    $default  reduce using rule 68 (expression)
+
+    direct-declarator  go to state 99
+    parameter-list     go to state 100
+    expression         go to state 130
+
+
+State 130
+
+   54 for-statement: FOR '(' expression SEMI expression SEMI expression . ')' statement
+   55              | FOR '(' expression SEMI expression SEMI expression . ')' compound-statement
+   60 expression: expression . LE expression
+   61           | expression . GE expression
+   62           | expression . NE expression
+   63           | expression . EQ expression
+   64           | expression . GT expression
+   65           | expression . LT expression
+
+    LE   shift, and go to state 106
+    GE   shift, and go to state 107
+    NE   shift, and go to state 108
+    LT   shift, and go to state 109
+    GT   shift, and go to state 110
+    EQ   shift, and go to state 111
+    ')'  shift, and go to state 131
+
+
+State 131
+
+   54 for-statement: FOR '(' expression SEMI expression SEMI expression ')' . statement
+   55              | FOR '(' expression SEMI expression SEMI expression ')' . compound-statement
+
+    error   shift, and go to state 1
+    INT     shift, and go to state 2
+    FLOAT   shift, and go to state 3
+    CHAR    shift, and go to state 4
+    VOID    shift, and go to state 5
+    FOR     shift, and go to state 83
+    WHILE   shift, and go to state 84
+    IF      shift, and go to state 85
+    PRINTF  shift, and go to state 86
+    NUM     shift, and go to state 6
+    ID      shift, and go to state 7
+    SEMI    shift, and go to state 87
+    MINUS   shift, and go to state 8
+    '\''    shift, and go to state 9
+    '('     shift, and go to state 10
+    '{'     shift, and go to state 79
+
+    declaration          go to state 89
+    direct-declarator    go to state 13
+    function-reference   go to state 14
+    parameter-list       go to state 15
+    compound-statement   go to state 132
+    statement            go to state 133
+    type-specifier       go to state 75
+    iteration-statement  go to state 91
+    for-statement        go to state 92
+    selection-statement  go to state 93
+    print-statement      go to state 94
+
+
+State 132
+
+   55 for-statement: FOR '(' expression SEMI expression SEMI expression ')' compound-statement .
+
+    $default  reduce using rule 55 (for-statement)
+
+
+State 133
+
+   54 for-statement: FOR '(' expression SEMI expression SEMI expression ')' statement .
+
+    $default  reduce using rule 54 (for-statement)

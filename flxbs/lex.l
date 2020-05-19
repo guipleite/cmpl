@@ -5,45 +5,45 @@
     void showError();;
 %}
 
-identifier   [a−zA−Z_][a−zA−Z0−9_]*
-string      "[a−zA−Z_][a−zA−Z0−9_]*"
-character    [a−zA−Z_]*
-integer      [0-9]*
-floating     [0-9]*\.?[0-9]
+alpha [a-zA-Z]
+digit [0-9]
 
 %%
 
 [ \t]		;
 [ \n]   { yylineno = yylineno + 1;}
 
-int                 return(int);
-char                return(char);
-and                 return(and);
-or                  return(or);
-">"                 return(greater);
-"<"                 return(lesser);
-"=="                return(leq);;
-"-"                 return(minus);
-"+"                 return(plus);
-"*"                 return(mult);
-"/"                 return(div);
-if                  return(if);
-else                return(else);
-while               return(while);
-for                 return(for);
-func                return(func);
-return              return(return);
+int                 return(INT);
+float               return(FLOAT);
+char                return(CHAR);
+and                 return(AND);
+or                  return(OR);
+if                  return(IF);
+else                return(ELSE);
+while               return(WHILE);
+for                 return(FOR);
+break               return(BREAK);
+return              return(RETURN);
 
-";"                 return(endline);
-","                 return(comma);
-"("                 return(openP);
-");"                 return(closeP);
-"}"                 return(closeB);
-"{"                 return(openB);
-"["                 return(openK);
-"]"                 return(closeK);
+{digit}+                    return (NUM);
+{alpha}({alpha}|{digit})*   return (ID);
+"<="                        return LE;
+">="                        return GE;
+"=="                        return EQ;
+"!="                        return NE;
+">"	                        return GT;
+"<" 	                    return LT;
+"."                         return DOT;
+"-"                 return(MINUS);
+"+"                 return(PLUS);
+"*"                 return(MULT);
+"/"                 return(DIV);
+";"                 return(SEMI);
+","                 return(COMMA);
 
-.      		        {showError(); return(OTHER);}
+\/\/.* ;
+\/\*(.*\n)*.*\*\/ ;
+.                           return yytext[0];
 
 %%
 
