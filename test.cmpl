@@ -1,0 +1,45 @@
+    b = 3;
+    c1 = 0 ;
+    a = 1;
+    d = 2;
+    while(b < 0){
+        if (a > d){
+            printf 123;
+        }
+        else if (d < a) {
+            d = d + 1;
+        }
+        else {
+            c = c + i;
+        }
+        b = b-1;
+    }
+    printf c1;
+    printf a;
+    printf d;
+    printf b;
+    /*re = scanf();*/
+    x = 1 + True; /* Ok */
+    printf x;
+    x = 1 and True; /* Ok */
+    printf x;
+    x = "a" . 1 . True; /* Ok */
+    printf x;
+    x = "a" == "b"; /* Ok, resultado bool: False */
+    printf x;
+    func soma(x, y) {
+        h = x + y;
+
+        func soma2(c, b){
+            printf c+b;
+        }
+        soma2(h, 2);
+        return h;
+    }
+    j =8;
+
+    l= soma(j,2);
+
+    printf j;
+    printf l;
+
