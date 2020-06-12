@@ -1,6 +1,6 @@
 import sys
 
-reserved_words = ["printf","and","or","!","if","while","else","scanf","true","false","func","return"]
+reserved_words = ["printf","and","or","!","if","while","else","scanf","true","false","def","return"]
 declared_funcs = []
 
 class PrePro():
@@ -153,7 +153,7 @@ class Tokenizer():
 
             if var.lower() in reserved_words:
                 self.actual = Token('res', var.lower())
-                if self.actual.tokenValue == "func":
+                if self.actual.tokenValue == "def":
                     func = ''
 
                     self.positon+=1
@@ -340,7 +340,7 @@ class SymbolTable():
             raise Exception("Erro, verifique a exprecao funcao nao declarada")
 
     def func_setter(self,iden, value):
-        if iden not in self.func_dict or iden !="func":
+        if iden not in self.func_dict or iden !="def":
             self.func_dict[iden] = value
 
     @staticmethod
@@ -353,7 +353,7 @@ class SymbolTable():
 
     @staticmethod
     def ret_setter(iden, value):
-        if iden not in SymbolTable.ret_dict or iden !="func":
+        if iden not in SymbolTable.ret_dict or iden !="def":
             SymbolTable.ret_dict[iden] = value
 
 class FuncDec(Node):
@@ -803,10 +803,7 @@ class Parser():
 
 def main():
 
-    try:
-        fileobj = open(sys.argv[1], 'r')
-    except IndexError:
-        fileobj = open("./test.cmpl",'r')
+    fileobj = open(sys.argv[1], 'r')
 
     with fileobj:
         data = fileobj.read()

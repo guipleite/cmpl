@@ -13,9 +13,6 @@ digit [0-9]
 [ \t]		;
 [ \n]   { yylineno = yylineno + 1;}
 
-int                 return(INT);
-float               return(FLOAT);
-char                return(CHAR);
 and                 return(AND);
 or                  return(OR);
 if                  return(IF);

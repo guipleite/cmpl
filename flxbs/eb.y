@@ -8,7 +8,6 @@ void yyerror(const char *s);
 
 %}
 
-%token INT FLOAT CHAR VOID
 %token FOR WHILE BREAK RETURN
 %token IF ELSE PRINTF 
 %token NUM ID
@@ -19,89 +18,73 @@ void yyerror(const char *s);
 %token LE GE NE LT GT PLUS MINUS MULT DIV EQ
 %%
 
-start:	function-definition 
-		| declaration
+start: function-definition 
+	 | declaration
+	 |
 ;
 
-declaration: type-specifier direct-declarator SEMI 
-			| direct-declarator SEMI  	
-			| function-reference SEMI 	
-			| parameter-list SEMI	
-			| type-specifier parameter-list SEMI   
-			| error	
+declaration: direct-declarator SEMI 
+		   | function-reference SEMI 	
+		   | error	
 ;
 
 direct-declarator: ID '=' direct-declarator
-			| ID '=' function-reference
-			| ID '=' parameter-list
-			| parameter-list '=' direct-declarator
-			| ID COMMA direct-declarator
-			| NUM COMMA direct-declarator
-			| ID PLUS direct-declarator
-			| ID MINUS direct-declarator
-			| ID MULT direct-declarator
-			| ID DIV direct-declarator	
-			| NUM PLUS direct-declarator
-			| NUM MINUS direct-declarator
-			| NUM MULT direct-declarator
-			| NUM DIV direct-declarator
-			| '\'' direct-declarator '\''	
-			| '(' direct-declarator ')'
-			| MINUS '(' direct-declarator ')'
-			| MINUS NUM
-			| MINUS ID
-			| NUM
-			| ID
+			     | ID '=' function-reference
+			     | ID COMMA direct-declarator
+			     | NUM COMMA direct-declarator
+			     | ID PLUS direct-declarator
+			     | ID MINUS direct-declarator
+			     | ID MULT direct-declarator
+			     | ID DIV direct-declarator	
+			     | NUM PLUS direct-declarator
+			     | NUM MINUS direct-declarator
+			     | NUM MULT direct-declarator
+			     | NUM DIV direct-declarator
+			     | '(' direct-declarator ')'
+			     | MINUS '(' direct-declarator ')'
+			     | MINUS NUM
+			     | MINUS ID
+			     | NUM
+			     | ID
 ;
 
-function-reference: ID'('')'
-			| ID'('direct-declarator')'
+function-reference: ID'(' ')'
+			      | ID'('direct-declarator')'
 ;
 
-parameter-list: ID'['direct-declarator']'
-;
-
-function-definition: type-specifier ID '(' initializer ')' compound-statement 
+function-definition: ID '(' initializer ')' compound-statement 
 ;
 
 initializer: initializer-lis
-			|
-;
-initializer-lis:initializer-lis COMMA declaration
-		| declaration
 ;
 
-declaration:type-specifier ID
+initializer-lis: initializer-lis COMMA declaration
+		       | declaration
 ;
 
 compound-statement:	'{' statement-list '}'
 ;
 
-statement-list:statement-list statement
-	|
-;
-statement:	iteration-statement
-		| declaration
-		| for-statement
-		| selection-statement
-		| print-statement
-		| SEMI
+statement-list: statement-list statement
+			  |
 ;
 
-type-specifier:INT 
-		| FLOAT
-		| CHAR
-		| VOID 
+statement: iteration-statement
+		 | declaration
+		 | for-statement
+		 | selection-statement
+		 | print-statement
+		 | SEMI
 ;
 
 iteration-statement: WHILE '(' expression ')' statement  
-			| WHILE '(' expression ')' compound-statement 
+			       | WHILE '(' expression ')' compound-statement 
 ;
 
 for-statement: FOR '(' expression SEMI expression SEMI expression ')' statement 
-			| FOR '(' expression SEMI expression SEMI expression ')' compound-statement 
-			| FOR '(' expression ')' statement 
-			| FOR '(' expression ')' compound-statement 
+			 | FOR '(' expression SEMI expression SEMI expression ')' compound-statement 
+			 | FOR '(' expression ')' statement 
+			 | FOR '(' expression ')' compound-statement 
 ;
 
 selection-statement: IF '(' expression ')' statement 
@@ -110,15 +93,14 @@ selection-statement: IF '(' expression ')' statement
 print-statement: PRINTF '(' expression ')' SEMI
 ;
 
-expression:	 expression LE expression 
-			| expression GE expression
-			| expression NE expression
-			| expression EQ expression
-			| expression GT expression
-			| expression LT expression
-			| direct-declarator
-			| parameter-list
-			|
+expression: expression LE expression 
+		  | expression GE expression
+	      | expression NE expression
+		  | expression EQ expression
+		  | expression GT expression
+		  | expression LT expression
+		  | direct-declarator
+		  |
 ;
 
 %%
