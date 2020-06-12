@@ -1,10 +1,10 @@
 A Cmpl é uma linguagem que combina características de C e Python para criar uma linguagem de simples uso e fácil entendimento.
 
-EBNF: [ebnf.txt](./ebnf.txt)
-
 Apresentação: [Cmpl.pdf](./Cmpl.pdf)
 
 Compilador: [main.py](./main.py )
+
+EBNF: [ebnf.txt](./ebnf.txt)
 
 Para compilar o programa criado pelo Flex & Bison:
 
