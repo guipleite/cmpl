@@ -8,8 +8,7 @@ Compilador: [main.py](./main.py )
 
 Para compilar o programa criado pelo Flex & Bison:
 
-    cd /flxbs
-    make
+    (cd ./flxbs && make)
 
 Para analizar o programa com o parser criado pelo Bison:
 
